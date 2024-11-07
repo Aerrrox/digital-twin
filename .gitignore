@@ -11,14 +11,10 @@ docker-compose.override.yml
 
 # dependencies
 /frontend/node_modules/*
-/.pnp
-.pnp.js
+/frontend/.pnp
+/frontend/.pnp.js
 
-# testing
-/coverage
 
-# production
-/build
 
 # misc
 .DS_Store
@@ -32,8 +28,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # Node.js
-.env
-.next/
-build/
-dist/
-coverage/
+/frontend/.env
+/frontend/.next/
+/frontend/build/
+/frontend/dist/
+/frontend/coverage/
