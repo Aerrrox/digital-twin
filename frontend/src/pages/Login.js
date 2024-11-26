@@ -23,7 +23,7 @@ function Login() {
 
     const handleLogin = async () => {
         try {
-            const data = await sendRequest('http://localhost:8000/api/login/', 'POST', {
+            const data = await sendRequest('http://localhost:8000/auth_api/login/', 'POST', {
                 username,
                 password,
             });

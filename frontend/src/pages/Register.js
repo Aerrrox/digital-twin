@@ -7,6 +7,7 @@ function Register() {
     const [email, setEmail] = useState('');
     const navigate = useNavigate();
 
+
     const sendRequest = async (url, method, body) => {
         const response = await fetch(url, {
             method,
@@ -22,9 +23,10 @@ function Register() {
         return data;
     };
 
+
     const handleRegister = async () => {
         try {
-            const data = await sendRequest('http://localhost:8000/api/register/', 'POST', {
+            const data = await sendRequest('http://localhost:8000/auth_api/register/', 'POST', {
                 username,
                 password,
                 email,
