@@ -6,7 +6,7 @@ export async function refreshAccessToken() {
     const refreshToken = localStorage.getItem('refreshToken')
 
     try {
-        const response = await fetch('http://localhost:8000/api/token/refresh/', {
+        const response = await fetch('http://localhost:8000/auth_api/token/refresh/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -61,7 +61,7 @@ export async function fetchUserProfile() {
     const accessToken = localStorage.getItem('accessToken')
 
     try {
-        const response = await fetch('http://localhost:8000/api/home/', {
+        const response = await fetch('http://localhost:8000/auth_api/home/', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ export async function handleLogout() {
     const accessToken = localStorage.getItem('accessToken')
 
     try {
-        const response = await fetch('http://localhost:8000/api/logout/', {
+        const response = await fetch('http://localhost:8000/auth_api/logout/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

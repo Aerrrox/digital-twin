@@ -8,7 +8,7 @@ function Register() {
     const navigate = useNavigate()
 
     const handleRegister = async () => {
-    const response = await fetch('http://localhost:8000/api/register/', {
+    const response = await fetch('http://localhost:8000/auth_api/register/', {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json',
