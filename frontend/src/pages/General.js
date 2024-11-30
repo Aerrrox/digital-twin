@@ -4,9 +4,9 @@ let plotCount = 0;
 
 // Список доступных растений с изображениями
 const plants = {
-    "Картошка": "/src/images/potato.jpg",
-    "Помидоры": "/src/images/tomato.jpg",
-    "Морковь": "/src/images/carrot.png",
+    "Картошка": "potato.jpg",
+    "Помидоры": "tomato.jpg",
+    "Морковь": "carrot.png",
 };
 
 
@@ -29,7 +29,7 @@ function updatePlotDetails() {
         if (plotData?.plant) {
             plantInfo.textContent = `Растение: ${plotData.plant}, Грядок: ${plotData.beds}`;
             const plantImage = document.createElement("img");
-            plantImage.src = plants[plotData.plant];
+            plantImage.src = plants[plotData.plant]; // Путь к картинке
             plantImage.alt = plotData.plant;
             plantImage.style.width = "100px";
             plantImage.style.height = "100px";
@@ -80,23 +80,6 @@ document.getElementById("create-plot-frame").addEventListener("click", () => {
     document.getElementById("plots-footer-container").appendChild(newPlot);
 });
 
-// Посадить растение
-document.getElementById("plant-button").addEventListener("click", () => {
-    const plantType = prompt("Выберите растение: Картошка, Помидоры, Морковь");
-    if (!plants[plantType]) {
-        alert("Неверный выбор. Попробуйте снова.");
-        return;
-    }
-    const bedCount = parseInt(prompt("Введите количество грядок:"), 10);
-
-    if (!isNaN(bedCount) && bedCount > 0) {
-        plots[currentPlot] = { plant: plantType, beds: bedCount };
-        updatePlotDetails();
-    } else {
-        alert("Некорректный ввод. Попробуйте снова.");
-    }
-});
-
 // Смена имени пользователя
 function editUsername() {
     const newName = prompt("Введите новое имя пользователя:");
@@ -115,4 +98,34 @@ document.getElementById("avatar-input").addEventListener("change", (event) => {
         };
         reader.readAsDataURL(file);
     }
+});
+document.getElementById("plant-button").addEventListener("click", () => {
+    // Показываем модальное окно
+    document.getElementById("plant-modal").style.display = "flex";
+});
+
+// Обработка кнопки "Посадить"
+document.getElementById("plant-confirm").addEventListener("click", () => {
+    const plantType = document.getElementById("plant-select").value;
+    const bedCount = parseInt(document.getElementById("bed-count").value, 10);
+
+    if (!plantType || isNaN(bedCount) || bedCount <= 0) {
+        alert("Некорректные данные. Попробуйте снова.");
+        return;
+    }
+
+    // Обновляем данные участка
+    plots[currentPlot] = { plant: plantType, beds: bedCount };
+
+    // Закрываем модальное окно
+    document.getElementById("plant-modal").style.display = "none";
+    document.getElementById("bed-count").value = ""; // Очистить поле
+    updatePlotDetails();
+});
+
+// Обработка кнопки "Отмена"
+document.getElementById("plant-cancel").addEventListener("click", () => {
+    // Скрываем модальное окно
+    document.getElementById("plant-modal").style.display = "none";
+    document.getElementById("bed-count").value = ""; // Очистить поле
 });

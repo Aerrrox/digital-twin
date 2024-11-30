@@ -49,7 +49,24 @@
                 <div id="weather">Погода: +15°C</div>
             </div>
         </div>
-    </footer>    
+    </footer>  
+    
+    <!-- Модальное окно -->
+<div id="plant-modal" class="modal">
+    <div class="modal-content">
+        <h3>Выберите растение</h3>
+        <label for="plant-select">Растение:</label>
+        <select id="plant-select">
+            <option value="Картошка">Картошка</option>
+            <option value="Помидоры">Помидоры</option>
+            <option value="Морковь">Морковь</option>
+        </select>
+        <label for="bed-count">Количество грядок:</label>
+        <input type="number" id="bed-count" min="1" placeholder="Введите количество">
+        <button id="plant-confirm">Посадить</button>
+        <button id="plant-cancel">Отмена</button>
+    </div>
+</div>
 
     <script src="General.js"></script>
 </body>
