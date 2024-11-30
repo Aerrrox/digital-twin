@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Умный агроном</title>
+    <link rel="stylesheet" href="General.css">
+</head>
+<body>
+    <header>
+        <div id="menu">
+            <button>Растения</button>
+            <button>Грядки</button>
+            <button>Полив</button>
+            <button>Удобрения</button>
+        </div>
+        <div id="user-profile">
+            <label for="avatar-input" id="avatar-label">
+                <img id="avatar" src="default-avatar.png" alt="Аватар">
+            </label>
+            <input type="file" id="avatar-input" accept="image/*">
+            <span id="username" onclick="editUsername()">Имя пользователя</span>
+        </div>
+    </header>
+    
+    <main id="main-content">
+        <h2 id="plot-title">Выберите участок</h2>
+        <div id="plot-details">
+            <p id="plant-info">Нет данных</p>
+            <div id="plant-image-container"></div>
+        </div>
+        <button id="plant-button" disabled>Посадить растение</button>
+    </main>
+    
+    
+    <footer>
+        <div id="footer-content">
+            <!-- Левый блок: участки -->
+            <div id="plots-container">
+                <div id="plots-footer-container"></div>
+                <div id="create-plot-frame">
+                    <span>+</span>
+                    <p>Создать участок</p>
+                </div>
+            </div>
+            <!-- Правый блок: погода и количество участков -->
+            <div id="footer-info">
+                <div id="plot-count">Количество участков: 0</div>
+                <div id="weather">Погода: +15°C</div>
+            </div>
+        </div>
+    </footer>    
+
+    <script src="General.js"></script>
+</body>
+</html>
