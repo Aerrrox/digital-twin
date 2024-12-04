@@ -7,25 +7,24 @@ from django.db.models import Q
 
 from auth_api.models import User
 from .models import Plant, Plot, Bed
-from .serializer import PlotSerializer
+from .serializer import PlotGetSerializer, PlotPostSerializer, BedListSerializer, NewBedSerializer
 
 class NewPlot(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request, user_id):
-        title = request.data.get('title')
         user = User.objects.get(id=user_id)
+        serializer = PlotPostSerializer(data=request.data, context={'user':user})
 
-        if user.plot_set.filter(title=title):
-            return Response({'error':'Участок с таким именем уже есть'}, status=status.HTTP_400_BAD_REQUEST)
+        if serializer.is_valid():
+            plot = Plot.objects.create(user=user, title=serializer.validated_data['title'])
+            data = {
+                'message': 'Участок создан',
+                'title': plot.title,
+            }
+            return Response(data, status=status.HTTP_201_CREATED)
         
-        plot = Plot(user=user, title=title)
-        plot.save()
-        data = {
-            'message': 'Участок создан',
-            'title': title,
-        }
-        return Response(data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class PlotList(APIView):
     permission_classes = (IsAuthenticated, )
@@ -33,7 +32,35 @@ class PlotList(APIView):
     def get(self, request, user_id):
         user = User.objects.get(id=user_id)
         plots = user.plot_set.all()
-        serializer = PlotSerializer(plots, many=True)
+        serializer = PlotGetSerializer(plots, many=True)
 
         return Response(serializer.data)
         
+
+class NewBed(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request, plot_id):
+        plot = Plot.objects.get(id=plot_id)
+        serializer = NewBedSerializer(data=request.data, context={'plot': plot})
+
+        if serializer.is_valid():
+            bed = serializer.save()  # Создаем грядку через сериализатор
+            data = {
+                'message': 'Грядка сделана!',
+                'plot': bed.plot.title,
+                'group': bed.group,
+                'wet': bed.wet,
+            }
+            return Response(data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class BedList(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, plot_id):
+        plot = Plot.objects.get(id=plot_id)
+        beds = plot.bed_set.all()
+        serializer = BedListSerializer(beds, many=True)
+        return Response(serializer.data)

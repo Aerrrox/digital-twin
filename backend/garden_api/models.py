@@ -3,8 +3,11 @@ from django.db import models
 from auth_api.models import User
 
 class Plant(models.Model):
-    title = models.CharField('plantname', max_length=128)
+    title = models.CharField('plantname', max_length=128, unique=True)
     info = models.TextField('someInfo', blank=True, null=True)
+
+    def __str__(self):
+        return self.title
 
 class Plot(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -17,9 +20,12 @@ class Plot(models.Model):
 
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        return self.title
+
 class Bed(models.Model):
     plot = models.ForeignKey(Plot, on_delete=models.CASCADE)
     plant = models.ForeignKey(Plant, on_delete=models.SET_NULL, blank=True, null=True)
     group = models.IntegerField(default=0)
-    wet = models.PositiveSmallIntegerField(max_length=100)
+    wet = models.PositiveSmallIntegerField(max_length=100, blank=True, null=True)
     info = models.TextField('someInfo', blank=True, null=True)
