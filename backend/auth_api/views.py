@@ -45,5 +45,9 @@ class HomeView(APIView):
 
     def get(self, request):
         username = request.user.username
-        return Response({'username': username})
+        user_id = request.user.id
+        return Response({
+            'user_id': user_id,
+            'username': username
+            })
         
