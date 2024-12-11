@@ -248,3 +248,67 @@ footer {
 .modal-content button:hover {
     background-color: #66BB6A;
 }
+/* стили для модального окна создания участка*/
+/* Стили для модального окна */
+.modal {
+    display: none; /* Изначально скрыто */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Полупрозрачный фон */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #F1F8E9; /* Светло-зеленый фон */
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 300px;
+}
+
+.modal-content h3 {
+    margin-bottom: 20px;
+    color: #2E7D32; /* Темно-зеленый текст */
+}
+
+.modal-content label {
+    display: block;
+    margin: 10px 0 5px;
+    color: #2E7D32;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #4CAF50;
+    border-radius: 5px;
+}
+
+.modal-content button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 5px;
+    transition: background-color 0.3s;
+}
+
+.modal-content button:hover {
+    background-color: #66BB6A;
+}
+/* стиль для выбора участка */
+.plot.selected {
+    background-color: #388E3C; /* Темно-зеленый */
+    color: white;
+    border-color: #FFD700; /* Золотая рамка */
+    transition: background-color 0.3s, color 0.3s;
+}
