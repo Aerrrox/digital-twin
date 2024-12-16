@@ -34,8 +34,8 @@ class BedListSerializer(serializers.ModelSerializer):
     
 class NewBedSerializer(serializers.ModelSerializer):
     plant = serializers.CharField(required=False, allow_null=True)
-    group = serializers.CharField(max_length=255, required=False, allow_null=True)
-    wet = serializers.BooleanField(required=False, allow_null=True)
+    group = serializers.IntegerField(required=False, allow_null=True)  # Приводим к числовому типу
+    wet = serializers.IntegerField(required=False, allow_null=True)  # Исправлено с BooleanField на IntegerField
 
     class Meta:
         model = Bed
@@ -53,13 +53,8 @@ class NewBedSerializer(serializers.ModelSerializer):
         if validated_data.get('plant'):
             plant = Plant.objects.get(title=validated_data['plant'])
         
-        group = 0
-        if validated_data.get('group'):
-            group = validated_data['group']
-        
-        wet = 0
-        if validated_data.get('wet'):
-            wet = validated_data['wet']
+        group = validated_data.get('group', 0)  # Значение по умолчанию
+        wet = validated_data.get('wet', 0)  # Значение по умолчанию
 
         return Bed.objects.create(
             plot=plot,
@@ -67,3 +62,13 @@ class NewBedSerializer(serializers.ModelSerializer):
             group=group,
             wet=wet
         )
+    
+class BedUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Bed
+        fields = ['group', 'wet', 'info']
+
+class PlantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Plant
+        fields = ['title', 'info']

@@ -14,6 +14,8 @@ import dj_database_url
 
 from pathlib import Path
 
+import sys
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -41,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'drf_yasg',
     'rest_framework',
     'rest_framework.authtoken',
     'auth_api',
@@ -109,11 +112,22 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASE_URL = 'postgresql://dguser:dgpassword@localhost:5432/digitaltwin'
-
 DATABASES = {
-    'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=False)
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'digitaltwin',
+        'USER': 'dguser',
+        'PASSWORD': 'dgpassword',
+        'HOST': 'localhost',
+        'PORT': '5432',
+        'TEST': {
+            'NAME': 'test_digitaltwin',
+        },
+    }
 }
+
+if 'test' in sys.argv:
+    DATABASES['default']['NAME'] = 'digitaltwin_test'
 
 
 # Password validation
