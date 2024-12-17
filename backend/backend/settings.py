@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'drf_yasg',
+    'django_celery_beat',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt.token_blacklist',
@@ -201,3 +202,8 @@ CACHES = {
         }
     }
 }
+
+CELERY_BROKER_URL = 'redis://localhost:6379/1'  # URL Redis
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/2'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
