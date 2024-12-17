@@ -118,7 +118,7 @@ DATABASES = {
         'NAME': 'digitaltwin',
         'USER': 'dguser',
         'PASSWORD': 'dgpassword',
-        'HOST': 'localhost',
+        'HOST': 'postgres',
         'PORT': '5432',
         'TEST': {
             'NAME': 'test_digitaltwin',
