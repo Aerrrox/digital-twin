@@ -4,12 +4,15 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.db.models import Q
+from django.utils import timezone
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
 
 from auth_api.models import User
 from .models import Plant, Plot, Bed
 from .serializer import (
     PlotGetSerializer, PlotPostSerializer, BedListSerializer, NewBedSerializer,
-    PlotPostSerializer, BedUpdateSerializer, PlantSerializer)
+    PlotPostSerializer, BedUpdateSerializer, PlantSerializer, )
 
 class NewPlot(APIView):
     permission_classes = (IsAuthenticated, )
@@ -177,6 +180,7 @@ class BedPlant(APIView):
 class PlantList(APIView):
     permission_classes = (IsAuthenticated, )  # Доступ только для авторизованных пользователей
 
+    @method_decorator(cache_page(60))  # Кэш на 60 секунд
     def get(self, request):
         try:
             plants = Plant.objects.all()
@@ -246,5 +250,79 @@ class RemovePlant(APIView):
             return Response({"message": "Растение успешно удалено с грядки"}, status=status.HTTP_200_OK)
         except Bed.DoesNotExist:
             return Response({"error": "Грядка не найдена или недоступна"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class BedsInGroup(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, group_id):
+        try:
+            # Фильтруем грядки по группе и текущему пользователю
+            beds = Bed.objects.filter(plot__user=request.user, group=group_id)
+            serializer = BedListSerializer(beds, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class ChangeBedGroup(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def patch(self, request, bed_id):
+        try:
+            # Получаем грядку текущего пользователя
+            bed = Bed.objects.get(id=bed_id, plot__user=request.user)
+            new_group = request.data.get('group')
+
+            # Проверяем, что новая группа корректна
+            if not isinstance(new_group, int) or new_group < 0:
+                return Response({"error": "Группа должна быть положительным числом"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Обновляем группу
+            bed.group = new_group
+            bed.save()
+            return Response({"message": "Группа грядки успешно обновлена", "group": bed.group}, status=status.HTTP_200_OK)
+
+        except Bed.DoesNotExist:
+            return Response({"error": "Грядка не найдена или недоступна"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class WaterBedsInGroup(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request, group_id):
+        try:
+            # Получаем все грядки в группе, принадлежащие пользователю
+            beds = Bed.objects.filter(plot__user=request.user, group=group_id)
+
+            if not beds.exists():
+                return Response({"message": "В этой группе нет грядок"}, status=status.HTTP_200_OK)
+
+            # Поливаем грядки: обновляем поля wet и last_watered
+            for bed in beds:
+                bed.wet = 100
+                bed.last_watered = timezone.now()
+                bed.save()
+
+            return Response({"message": "Все грядки в группе политые"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ResetGroup(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def delete(self, request, group_id):
+        try:
+            # Получаем все грядки в указанной группе и текущего пользователя
+            beds = Bed.objects.filter(plot__user=request.user, group=group_id)
+
+            if not beds.exists():
+                return Response({"message": "В этой группе нет грядок"}, status=status.HTTP_200_OK)
+
+            # Сбрасываем номер группы
+            beds.update(group=0)
+
+            return Response({"message": "Группа успешно сброшена"}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

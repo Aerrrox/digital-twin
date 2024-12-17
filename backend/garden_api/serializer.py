@@ -30,7 +30,7 @@ class BedListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Bed
-        fields = ['id', 'plot', 'plant', 'group', 'wet']
+        fields = ['id', 'plot', 'plant', 'group', 'wet', 'info']
     
 class NewBedSerializer(serializers.ModelSerializer):
     plant = serializers.CharField(required=False, allow_null=True)
@@ -72,3 +72,4 @@ class PlantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Plant
         fields = ['title', 'info']
+

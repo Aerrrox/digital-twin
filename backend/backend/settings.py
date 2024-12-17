@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt.token_blacklist',
     'auth_api',
     'garden_api'
 ]
@@ -118,7 +119,7 @@ DATABASES = {
         'NAME': 'digitaltwin',
         'USER': 'dguser',
         'PASSWORD': 'dgpassword',
-        'HOST': 'postgres',
+        'HOST': 'localhost',
         'PORT': '5432',
         'TEST': {
             'NAME': 'test_digitaltwin',
@@ -188,4 +189,15 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
+    'ROTATE_REFRESH_TOKENS': False,
+}
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://localhost:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
 }

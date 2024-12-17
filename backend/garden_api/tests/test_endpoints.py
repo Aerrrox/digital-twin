@@ -458,3 +458,144 @@ def test_remove_plant_from_bed():
     assert response.data['message'] == "Растение успешно удалено с грядки"
     bed.refresh_from_db()
     assert bed.plant is None  # Поле plant должно быть пустым
+
+@pytest.mark.django_db
+def test_get_beds_in_group():
+    from garden_api.models import Plant
+
+    # Создаём пользователя, участок и грядки с разными группами
+    user = User.objects.create_user(username="testuser", email="testuser@example.com", password="testpass")
+    plot = Plot.objects.create(user=user, title="Test Plot")
+    plant = Plant.objects.create(title="Томат", info="Полезный овощ")
+
+    Bed.objects.create(plot=plot, plant=plant, group=1, wet=50, info="Грядка 1")
+    Bed.objects.create(plot=plot, plant=plant, group=1, wet=60, info="Грядка 2")
+    Bed.objects.create(plot=plot, plant=plant, group=2, wet=70, info="Грядка 3")  # Другая группа
+
+    client = APIClient()
+
+    # Авторизация
+    login_url = '/auth_api/login/'
+    login_data = {'username': 'testuser', 'password': 'testpass'}
+    login_response = client.post(login_url, login_data, format='json')
+    token = login_response.data['access']
+    client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+
+    # GET-запрос для получения списка грядок в группе 1
+    url = '/garden_api/beds/group/1/'
+    response = client.get(url)
+
+    # Проверки
+    assert response.status_code == 200
+    assert len(response.data) == 2  # Должно быть две грядки в группе 1
+    assert response.data[0]['info'] == "Грядка 1"
+    assert response.data[1]['info'] == "Грядка 2"
+
+@pytest.mark.django_db
+def test_change_bed_group():
+    # Создаём пользователя, участок и грядку
+    user = User.objects.create_user(username="testuser", email="testuser@example.com", password="testpass")
+    plot = Plot.objects.create(user=user, title="Test Plot")
+    bed = Bed.objects.create(plot=plot, group=1, wet=50, info="Грядка для теста")
+
+    client = APIClient()
+
+    # Авторизация
+    login_url = '/auth_api/login/'
+    login_data = {'username': 'testuser', 'password': 'testpass'}
+    login_response = client.post(login_url, login_data, format='json')
+    token = login_response.data['access']
+    client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+
+    # PATCH-запрос на изменение группы грядки
+    url = f'/garden_api/bed/{bed.id}/change_group/'
+    data = {'group': 2}
+    response = client.patch(url, data, format='json')
+
+    # Проверки
+    assert response.status_code == 200
+    assert response.data['message'] == "Группа грядки успешно обновлена"
+    bed.refresh_from_db()
+    assert bed.group == 2  # Проверяем, что группа изменилась
+
+@pytest.mark.django_db
+def test_mass_water_beds_in_group():
+    from garden_api.models import Plant
+
+    # Создаём пользователя, участок и несколько грядок
+    user = User.objects.create_user(username="testuser", email="test@example.com", password="testpass")
+    plot = Plot.objects.create(user=user, title="Test Plot")
+    plant = Plant.objects.create(title="Томат", info="Полезный овощ")
+
+    Bed.objects.create(plot=plot, plant=plant, group=1, wet=50)
+    Bed.objects.create(plot=plot, plant=plant, group=1, wet=30)
+    Bed.objects.create(plot=plot, plant=plant, group=2, wet=20)  # Грядка в другой группе
+
+    client = APIClient()
+
+    # Авторизация
+    login_url = '/auth_api/login/'
+    login_data = {'username': 'testuser', 'password': 'testpass'}
+    login_response = client.post(login_url, login_data, format='json')
+    token = login_response.data['access']
+    client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+
+    # POST-запрос для полива группы 1
+    url = '/garden_api/beds/group/1/water/'
+    response = client.post(url)
+
+    # Проверки
+    assert response.status_code == 200
+    assert response.data['message'] == "Все грядки в группе политые"
+
+    # Проверяем обновлённые грядки
+    watered_beds = Bed.objects.filter(plot=plot, group=1)
+    for bed in watered_beds:
+        assert bed.wet == 100
+        assert bed.last_watered is not None
+
+@pytest.mark.django_db
+def test_reset_group_for_beds():
+    from garden_api.models import Plant
+
+    # Создаём пользователя, участок и несколько грядок в одной группе
+    user = User.objects.create_user(username="testuser", email="test@example.com", password="testpass")
+    plot = Plot.objects.create(user=user, title="Test Plot")
+    plant = Plant.objects.create(title="Томат", info="Полезный овощ")
+
+    Bed.objects.create(plot=plot, plant=plant, group=1, wet=50, info="Грядка 1")
+    Bed.objects.create(plot=plot, plant=plant, group=1, wet=60, info="Грядка 2")
+    Bed.objects.create(plot=plot, plant=plant, group=2, wet=70, info="Грядка 3")  # Другая группа
+
+    client = APIClient()
+
+    # Авторизация
+    login_url = '/auth_api/login/'
+    login_data = {'username': 'testuser', 'password': 'testpass'}
+    login_response = client.post(login_url, login_data, format='json')
+    token = login_response.data['access']
+    client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+
+    # DELETE-запрос для сброса группы 1
+    url = '/garden_api/beds/group/1/reset/'
+    response = client.delete(url)
+
+    # Проверки
+    assert response.status_code == 200
+    assert response.data['message'] == "Группа успешно сброшена"
+
+    # Проверяем, что у грядок группы 1 group=0
+    reset_beds = Bed.objects.filter(plot=plot, group=0)
+    assert reset_beds.count() == 2
+
+@pytest.mark.django_db
+def test_plant_list_caching():
+    client = APIClient()
+
+    # Первый запрос – без кэша
+    response = client.get('/garden_api/plants/')
+    assert response.status_code == 200
+
+    # Второй запрос – должен вернуться из кэша
+    response_cached = client.get('/garden_api/plants/')
+    assert response_cached.status_code == 200
