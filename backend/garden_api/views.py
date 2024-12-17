@@ -173,3 +173,78 @@ class BedPlant(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Bed.DoesNotExist:
             return Response({"error": "Грядка не найдена"}, status=status.HTTP_404_NOT_FOUND)
+        
+class PlantList(APIView):
+    permission_classes = (IsAuthenticated, )  # Доступ только для авторизованных пользователей
+
+    def get(self, request):
+        try:
+            plants = Plant.objects.all()
+            serializer = PlantSerializer(plants, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+from django.utils.timezone import now
+
+class WaterBed(APIView):
+    permission_classes = (IsAuthenticated,)  # Только авторизованные пользователи
+
+    def post(self, request, bed_id):
+        try:
+            # Ищем грядку, связанную с текущим пользователем
+            bed = Bed.objects.get(id=bed_id, plot__user=request.user)
+
+            # Проверяем, есть ли растение на грядке
+            if not bed.plant:
+                return Response({"error": "На грядке нет растений для полива"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Обновляем данные грядки
+            bed.last_watered = now()
+            bed.wet = 100  # Устанавливаем максимальную влажность
+            bed.save()
+
+            return Response({"message": "Грядка успешно полита"}, status=status.HTTP_200_OK)
+
+        except Bed.DoesNotExist:
+            return Response({"error": "Грядка не найдена или недоступна"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class BedStatus(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, bed_id):
+        try:
+            # Получаем грядку текущего пользователя
+            bed = Bed.objects.get(id=bed_id, plot__user=request.user)
+            status_bed = "увядшая" if bed.is_wilted else "здоровая"
+            last_watered = bed.last_watered.strftime("%Y-%m-%d %H:%M") if bed.last_watered else "Никогда"
+            return Response({
+                "id": bed.id,
+                "status": status_bed,
+                "last_watered": last_watered
+            }, status=status.HTTP_200_OK)
+        except Bed.DoesNotExist:
+            return Response({"error": "Грядка не найдена или недоступна"}, status=status.HTTP_404_NOT_FOUND)
+        
+class RemovePlant(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def delete(self, request, bed_id):
+        try:
+            # Проверяем, что грядка принадлежит текущему пользователю
+            bed = Bed.objects.get(id=bed_id, plot__user=request.user)
+            
+            if not bed.plant:
+                return Response({"message": "На грядке уже нет растения"}, status=status.HTTP_200_OK)
+            
+            # Удаляем растение из грядки
+            bed.plant = None
+            bed.save()
+
+            return Response({"message": "Растение успешно удалено с грядки"}, status=status.HTTP_200_OK)
+        except Bed.DoesNotExist:
+            return Response({"error": "Грядка не найдена или недоступна"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

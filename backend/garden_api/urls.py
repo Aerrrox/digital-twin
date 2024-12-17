@@ -3,7 +3,9 @@ from .views import (
     PlotList, NewPlot, BedList, NewBed,
     UpdatePlot, DeletePlot,
     UpdateBed, DeleteBed,
-    AddPlant, BedPlant, # UpdatePlant, DeletePlant
+    AddPlant, BedPlant, 
+    PlantList, WaterBed,
+    BedStatus, RemovePlant
 )
 
 urlpatterns = [
@@ -18,7 +20,11 @@ urlpatterns = [
     path('bed/<int:bed_id>/delete', DeleteBed.as_view(), name='delete_bed'),
 
     path('bed/<int:bed_id>/add_plant', AddPlant.as_view(), name='add_plant'),
-    path('bed/<int:bed_id>/plant', BedPlant.as_view(), name='plant_list'),
+    path('bed/<int:bed_id>/remove_plant/', RemovePlant.as_view(), name='remove_plant'),
+    path('bed/<int:bed_id>/plant', BedPlant.as_view(), name='bed_plant'),
+    path('plants/', PlantList.as_view(), name='plant_list'),
+    path('bed/<int:bed_id>/water/', WaterBed.as_view(), name='water_bed'),
+    path('bed/<int:bed_id>/status/', BedStatus.as_view(), name='bed_status'),
     # path('plant/<int:plant_id>/update', UpdatePlant.as_view(), name='update_plant'),
     # path('plant/<int:plant_id>/delete', DeletePlant.as_view(), name='delete_plant'),
 ]
