@@ -1,5 +1,6 @@
 FROM python:3.12-slim
 
+
 # Устанавливаем локали для поддержки русского языка
 RUN apt-get update && apt-get install -y locales && \
     echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
@@ -37,3 +38,4 @@ ENV POSTGRES_PASSWORD=your_password
 
 # Запускаем проект через entrypoint
 CMD ["sh", "/app/entrypoint.sh"]
+

@@ -1,3 +1,4 @@
+
 amqp==5.3.1
 asgiref==3.8.1
 billiard==4.2.1
@@ -54,3 +55,4 @@ urllib3==2.2.3
 vine==5.1.0
 wcwidth==0.2.13
 wrapt==1.17.0
+
