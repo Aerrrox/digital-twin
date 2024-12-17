@@ -1,12 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { getPlants } from "../api/api";
 
-function PlantCard({ title, image }) {
+function PlantCatalog({ onClose }) {
+    const [plants, setPlants] = useState([]);
+
+    useEffect(() => {
+        getPlants().then((response) => setPlants(response.data));
+    }, []);
+
     return (
-        <div className="plant-card">
-            {image && <img src={image} alt={title} />}
-            <h3>{title}</h3>
+        <div className="catalog">
+            <h2>Каталог растений</h2>
+            <ul>
+                {plants.map((plant) => (
+                    <li key={plant.id} onClick={() => onClose()}>
+                        {plant.title}
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 }
 
-export default PlantCard;
+export default PlantCatalog;
