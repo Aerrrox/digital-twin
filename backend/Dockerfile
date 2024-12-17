@@ -23,6 +23,10 @@ COPY . .
 # Собираем статику (если нужно)
 RUN python manage.py collectstatic --noinput
 
+# Добавляем скрипт entrypoint.sh для запуска дополнительных команд
+COPY ./entrypoint.sh /app/
+RUN chmod +x /app/entrypoint.sh
+
 # Переменные окружения для сервисов
 ENV CELERY_BROKER_URL=redis://redis:6379/1
 ENV CELERY_RESULT_BACKEND=redis://redis:6379/2
@@ -31,5 +35,5 @@ ENV POSTGRES_DB=your_db_name
 ENV POSTGRES_USER=your_user
 ENV POSTGRES_PASSWORD=your_password
 
-# Запуск сервера
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Запускаем проект через entrypoint
+CMD ["sh", "/app/entrypoint.sh"]

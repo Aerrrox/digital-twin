@@ -5,6 +5,7 @@ from auth_api.models import User
 class Plant(models.Model):
     title = models.CharField('plantname', max_length=128, unique=True)
     info = models.TextField('someInfo', blank=True, null=True)
+    image = models.ImageField(upload_to='plants/', blank=True, null=True)
 
     def __str__(self):
         return self.title

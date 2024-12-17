@@ -207,3 +207,15 @@ CELERY_BROKER_URL = 'redis://redis:6379/1'  # URL Redis
 CELERY_RESULT_BACKEND = 'redis://redis:6379/2'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
+
+# Настройка для MinIO (как S3 совместимый сервис)
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# Доступ к MinIO
+AWS_ACCESS_KEY_ID = 'minioadmin'          # Твой логин MinIO
+AWS_SECRET_ACCESS_KEY = 'minioadmin'      # Твой пароль MinIO
+AWS_STORAGE_BUCKET_NAME = 'media'         # Название бакета в MinIO
+AWS_S3_ENDPOINT_URL = 'http://minio:9000' # URL MinIO (Docker-сервис)
+
+# Убрать подпись из URL для упрощения доступа
+AWS_QUERYSTRING_AUTH = False
