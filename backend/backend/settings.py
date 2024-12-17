@@ -14,6 +14,8 @@ import dj_database_url
 
 from pathlib import Path
 
+import sys
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -30,6 +32,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -40,8 +43,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'drf_yasg',
+    'django_celery_beat',
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt.token_blacklist',
     'auth_api',
     'garden_api'
 ]
@@ -108,15 +114,28 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASE_URL = 'postgresql://dguser:dgpassword@localhost:5432/digitaltwin'
-
 DATABASES = {
-    'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=False)
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'digitaltwin',
+        'USER': 'dguser',
+        'PASSWORD': 'dgpassword',
+        'HOST': 'postgres',
+        'PORT': '5432',
+        'TEST': {
+            'NAME': 'test_digitaltwin',
+        },
+    }
 }
+
+if 'test' in sys.argv:
+    DATABASES['default']['NAME'] = 'digitaltwin_test'
 
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
+
+AUTH_USER_MODEL = 'auth_api.User'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -171,4 +190,32 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
+    'ROTATE_REFRESH_TOKENS': False,
 }
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+CELERY_BROKER_URL = 'redis://redis:6379/1'  # URL Redis
+CELERY_RESULT_BACKEND = 'redis://redis:6379/2'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+
+# Настройка для MinIO (как S3 совместимый сервис)
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# Доступ к MinIO
+AWS_ACCESS_KEY_ID = 'minioadmin'          # Твой логин MinIO
+AWS_SECRET_ACCESS_KEY = 'minioadmin'      # Твой пароль MinIO
+AWS_STORAGE_BUCKET_NAME = 'media'         # Название бакета в MinIO
+AWS_S3_ENDPOINT_URL = 'http://minio:9000' # URL MinIO (Docker-сервис)
+
+# Убрать подпись из URL для упрощения доступа
+AWS_QUERYSTRING_AUTH = False

@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from .models import User
 from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
 from rest_framework.views import APIView
@@ -45,5 +45,9 @@ class HomeView(APIView):
 
     def get(self, request):
         username = request.user.username
-        return Response({'username': username})
+        user_id = request.user.id
+        return Response({
+            'user_id': user_id,
+            'username': username
+            })
         
