@@ -29,3 +29,5 @@ class Bed(models.Model):
     group = models.IntegerField(default=0)
     wet = models.PositiveSmallIntegerField(max_length=100, blank=True, null=True)
     info = models.TextField('someInfo', blank=True, null=True)
+    last_watered = models.DateTimeField(null=True, blank=True)
+    is_wilted = models.BooleanField(default=False)

@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.utils.timezone import now, timedelta
 from rest_framework.test import APIClient
 
 from auth_api.models import User
@@ -337,3 +338,123 @@ def test_add_plant_to_bed_with_existing_plant():
     # Проверяем, что возвращается ошибка
     assert response.status_code == 400
     assert response.data['error'] == "В грядке уже есть растение"
+
+
+@pytest.mark.django_db
+def test_get_plant_catalog():
+    # Создаём тестового пользователя
+    user = User.objects.create_user(username="testuser", email="test@example.com", password="testpass")
+
+    # Создаём тестовые записи в Plant
+    Plant.objects.create(title="Томат", info="Полезный овощ")
+    Plant.objects.create(title="Огурец", info="Свежий и зелёный")
+
+    client = APIClient()
+
+    # Получаем JWT-токен
+    login_url = '/auth_api/login/'
+    login_data = {'username': 'testuser', 'password': 'testpass'}
+    login_response = client.post(login_url, login_data, format='json')
+    assert login_response.status_code == 200
+    token = login_response.data['access']
+    
+    # Добавляем токен в заголовки
+    client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+
+    # GET-запрос к эндпоинту для получения каталога
+    url = "/garden_api/plants/"
+    response = client.get(url)
+    
+    # Проверка результата
+    assert response.status_code == 200
+    assert len(response.data) == 2
+    assert response.data[0]['title'] == "Томат"
+    assert response.data[0]['info'] == "Полезный овощ"
+    assert response.data[1]['title'] == "Огурец"
+    assert response.data[1]['info'] == "Свежий и зелёный"
+
+@pytest.mark.django_db
+def test_water_bed():
+
+    # Создаём тестового пользователя, растение, участок и грядку
+    user = User.objects.create_user(username="testuser", email="testuser@example.com", password="testpass")
+    plant = Plant.objects.create(title="Томат", info="Полезный овощ")  # Добавляем растение
+    plot = Plot.objects.create(user=user, title="Test Plot")
+    bed = Bed.objects.create(plot=plot, plant=plant, group=1, wet=50, last_watered=now() - timedelta(days=5))
+
+    client = APIClient()
+
+    # Авторизация
+    login_url = '/auth_api/login/'
+    login_data = {'username': 'testuser', 'password': 'testpass'}
+    login_response = client.post(login_url, login_data, format='json')
+    token = login_response.data['access']
+    client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+
+    # POST-запрос на полив грядки
+    url = f'/garden_api/bed/{bed.id}/water/'
+    response = client.post(url)
+
+    # Проверки
+    assert response.status_code == 200
+    assert response.data['message'] == "Грядка успешно полита"
+    bed.refresh_from_db()
+    assert bed.last_watered.date() == now().date()
+    assert bed.wet == 100  # Проверяем влажность
+
+@pytest.mark.django_db
+def test_bed_status():
+    from garden_api.models import Plant
+
+    # Создаём пользователя, растение, участок и увядшую грядку
+    user = User.objects.create_user(username="testuser", email="test@example.com", password="testpass")
+    plant = Plant.objects.create(title="Томат", info="Полезный овощ")
+    plot = Plot.objects.create(user=user, title="Test Plot")
+    bed = Bed.objects.create(plot=plot, plant=plant, group=1, wet=0, is_wilted=True, last_watered=now() - timedelta(days=5))
+
+    client = APIClient()
+
+    # Авторизация
+    login_url = '/auth_api/login/'
+    login_data = {'username': 'testuser', 'password': 'testpass'}
+    login_response = client.post(login_url, login_data, format='json')
+    token = login_response.data['access']
+    client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+
+    # GET-запрос для статуса грядки
+    url = f'/garden_api/bed/{bed.id}/status/'
+    response = client.get(url)
+
+    # Проверки
+    assert response.status_code == 200
+    assert response.data['status'] == "увядшая"
+    assert "last_watered" in response.data
+
+@pytest.mark.django_db
+def test_remove_plant_from_bed():
+    from garden_api.models import Plant
+
+    # Создаём пользователя, растение, участок и грядку с растением
+    user = User.objects.create_user(username="testuser", email="testuser@example.com", password="testpass")
+    plant = Plant.objects.create(title="Томат", info="Полезный овощ")
+    plot = Plot.objects.create(user=user, title="Test Plot")
+    bed = Bed.objects.create(plot=plot, plant=plant, group=1, wet=50)
+
+    client = APIClient()
+
+    # Авторизация
+    login_url = '/auth_api/login/'
+    login_data = {'username': 'testuser', 'password': 'testpass'}
+    login_response = client.post(login_url, login_data, format='json')
+    token = login_response.data['access']
+    client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+
+    # DELETE-запрос на удаление растения из грядки
+    url = f'/garden_api/bed/{bed.id}/remove_plant/'
+    response = client.delete(url)
+
+    # Проверки
+    assert response.status_code == 200
+    assert response.data['message'] == "Растение успешно удалено с грядки"
+    bed.refresh_from_db()
+    assert bed.plant is None  # Поле plant должно быть пустым
