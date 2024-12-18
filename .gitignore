@@ -4,10 +4,7 @@
 db.sqlite3
 __pycache__/*
 
-# Docker-specific
-*.docker
-docker-compose.override.yml
-/docker-compose.yml
+
 
 # dependencies
 /frontend/node_modules/*

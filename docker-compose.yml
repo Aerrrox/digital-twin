@@ -1,0 +1,187 @@
+  services:
+
+    # nginx:
+    #   image: nginx
+    #   container_name: Nginx
+    #   ports:
+    #     - "80:80"
+    #   volumes:
+    #     - ./html:/usr/share/nginx/html
+    #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    #   depends_on:
+    #     - backend
+    #     - frontend
+    #   networks:
+    #     - dev
+
+    backend:
+      container_name: backend-django
+      build:
+        context: ./backend/apps
+        dockerfile: Dockerfile
+      env_file:
+        - .env
+      environment:
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        POSTGRES_DB: ${POSTGRES_DB}
+        POSTGRES_HOST: ${POSTGRES_DB_HOST}
+      ports:
+        - "8000:8000"
+      volumes:
+        - ./backend:/app
+  #    network_mode: host
+      command: sh -c "python manage.py makemigrations &&
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000"
+      networks:
+        - dev
+      depends_on:
+        - postgres
+        - minio
+        - redis
+
+    frontend:
+      container_name: frontend
+      build:
+        context: ./frontend
+        dockerfile: Dockerfile
+      ports:
+        - "3000:3000"
+      volumes:
+        - ./frontend:/app
+      networks:
+        - dev
+
+    postgres:
+      image: postgres:latest
+      container_name: postgres_container
+      restart: always
+      shm_size: 128mb
+      environment:
+        POSTGRES_USER: dguser
+        POSTGRES_PASSWORD: dgpassword
+        POSTGRES_DB: digitaltwin
+      ports:
+        - "5432:5432"
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
+      networks:
+        - dev
+
+    # celery:
+    #   container_name: celery_worker
+    #   build:
+    #     context: ./backend
+    #     dockerfile: Dockerfile
+    #   command: celery -A core worker --loglevel=info
+    #   depends_on:
+    #     - backend
+    #     - redis
+    #   environment:
+    #     - CELERY_BROKER_URL=redis://redis:6379/0
+    #   volumes:
+    #     - ./backend:/app
+    #   networks:
+    #     - dev      
+
+
+
+    pgadmin:
+      image: dpage/pgadmin4:7.2
+      container_name: pgadmin_container
+      restart: always
+      environment:
+        PGADMIN_DEFAULT_EMAIL: admin@admin.com
+        PGADMIN_DEFAULT_PASSWORD: admin
+      ports:
+        - "5050:80" # Порт для веб-интерфейса pgAdmin
+      networks:
+        - dev
+      depends_on:
+        - postgres
+
+    minio:
+      image: minio/minio:latest
+      container_name: minio_container
+      restart: always
+      environment:
+        MINIO_ROOT_USER: minioadmin
+        MINIO_ROOT_PASSWORD: minioadmin
+      command: server /data --console-address ":9001"
+      ports:
+        - "9000:9000" # порт для API
+        - "9001:9001" # порт для панели управления
+      volumes:
+        - minio_data:/data
+      networks:
+        - dev
+
+    redis:
+      image: redis:7.4-alpine
+      container_name: redis
+      env_file:
+        - .env
+      command: ["redis-server", "--bind", "0.0.0.0"]
+      ports:
+        - "${REDIS_PORT}:6379"
+      networks:
+        - dev
+
+    # redis-commander:
+    #   container_name: redis-commander
+    #   hostname: redis-commander
+    #   image: rediscommander/redis-commander:latest
+    #   restart: always
+    #   env_file:
+    #     - .env
+    #   environment:
+    #     - REDIS_HOSTS=redis:redis:6379
+    #     - HTTP_USER=${REDIS_COMMANDER_USER}
+    #     - HTTP_PASSWORD=${REDIS_COMMANDER_PASS}
+    #   ports:
+    #     - "${REDIS_COMMANDER_PORT}:8081"
+    #   user: redis
+    #   networks:
+    #     - dev
+    #   depends_on:
+    #     - redis
+
+    swagger-ui:
+      image: swaggerapi/swagger-ui:latest
+      container_name: swagger-ui
+      ports:
+        - "8080:8080" # Swagger UI доступен на порту 8080
+      environment:
+        SWAGGER_JSON: http://backend:8000/swagger.json # Используем уже настроенный эндпоинт
+      depends_on:
+        - backend
+      networks:
+        - dev
+
+          
+
+    rabbitmq:
+      image: rabbitmq:3.10-management-alpine
+      container_name: rabbitmq
+      hostname: rabbitmq
+      restart: always
+      env_file:
+        - .env
+      environment:
+        RABBITMQ_DEFAULT_USER: user # Имя пользователя
+        RABBITMQ_DEFAULT_PASS: password # Пароль пользователя
+      ports:
+        - "${RABBITMQ_WEB_UI_PORT}:15672"
+        - "${RABBITMQ_PORT}:5672"
+      networks:
+        - dev
+
+  volumes:
+    postgres_data:
+    minio_data:
+    media:
+
+  networks:
+    dev:
+      driver: bridge
