@@ -2,8 +2,8 @@ from django.test import TestCase
 from django.utils.timezone import now, timedelta
 from rest_framework.test import APIClient
 
-from auth_api.models import User
-from garden_api.models import Plot, Bed, Plant
+from users.models import User
+from garden.models import Plot, Bed, Plant
 
 import pytest
 
@@ -16,7 +16,7 @@ def test_get_plot_list():
     client = APIClient()
 
     # Получаем JWT-токен
-    login_url = '/auth_api/login/'
+    login_url = '/users/login/'
     login_data = {'username': 'testuser', 'password': 'testpass'}
     login_response = client.post(login_url, login_data, format='json')
     assert login_response.status_code == 200
@@ -26,7 +26,7 @@ def test_get_plot_list():
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
     # Выполняем GET-запрос
-    url = f'/garden_api/user/{user.id}/plot_list'
+    url = f'/garden/user/{user.id}/plot_list'
     response = client.get(url)
 
     # Проверяем результат
@@ -42,7 +42,7 @@ def test_create_new_plot():
     client = APIClient()
 
     # Получаем JWT-токен
-    login_url = '/auth_api/login/'
+    login_url = '/users/login/'
     login_data = {'username': 'testuser', 'password': 'testpass'}
     login_response = client.post(login_url, login_data, format='json')
     assert login_response.status_code == 200
@@ -52,7 +52,7 @@ def test_create_new_plot():
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
     # Выполняем POST-запрос для создания нового участка
-    url = f'/garden_api/user/{user.id}/new_plot'
+    url = f'/garden/user/{user.id}/new_plot'
     data = {'title': 'My New Plot'}
     response = client.post(url, data, format='json')
 
@@ -75,7 +75,7 @@ def test_get_bed_list():
     client = APIClient()
 
     # Получаем JWT-токен
-    login_url = '/auth_api/login/'
+    login_url = '/users/login/'
     login_data = {'username': 'testuser', 'password': 'testpass'}
     login_response = client.post(login_url, login_data, format='json')
     assert login_response.status_code == 200
@@ -85,7 +85,7 @@ def test_get_bed_list():
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
     # Выполняем GET-запрос для получения списка грядок
-    url = f'/garden_api/plot/{plot.id}/bed_list'
+    url = f'/garden/plot/{plot.id}/bed_list'
     response = client.get(url)
 
     # Проверяем результат
@@ -104,7 +104,7 @@ def test_create_new_bed():
     client = APIClient()
 
     # Получаем JWT-токен
-    login_url = '/auth_api/login/'
+    login_url = '/users/login/'
     login_data = {'username': 'testuser', 'password': 'testpass'}
     login_response = client.post(login_url, login_data, format='json')
     assert login_response.status_code == 200
@@ -114,7 +114,7 @@ def test_create_new_bed():
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
     # Выполняем POST-запрос для создания новой грядки
-    url = f'/garden_api/plot/{plot.id}/new_bed'
+    url = f'/garden/plot/{plot.id}/new_bed'
     data = {'group': 3, 'wet': 80}  # Числовое значение для 'wet'
     response = client.post(url, data, format='json')
 
@@ -137,7 +137,7 @@ def test_update_plot():
     client = APIClient()
 
     # Получаем JWT-токен
-    login_url = '/auth_api/login/'
+    login_url = '/users/login/'
     login_data = {'username': 'testuser', 'password': 'testpass'}
     login_response = client.post(login_url, login_data, format='json')
     assert login_response.status_code == 200
@@ -147,7 +147,7 @@ def test_update_plot():
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
     # Выполняем PUT-запрос для обновления участка
-    url = f'/garden_api/plot/{plot.id}/update'
+    url = f'/garden/plot/{plot.id}/update'
     data = {'title': 'New Title'}
     response = client.put(url, data, format='json')
 
@@ -168,7 +168,7 @@ def test_delete_plot():
     client = APIClient()
 
     # Получаем JWT-токен
-    login_url = '/auth_api/login/'
+    login_url = '/users/login/'
     login_data = {'username': 'testuser', 'password': 'testpass'}
     login_response = client.post(login_url, login_data, format='json')
     assert login_response.status_code == 200
@@ -178,7 +178,7 @@ def test_delete_plot():
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
     # Выполняем DELETE-запрос для удаления участка
-    url = f'/garden_api/plot/{plot.id}/delete'
+    url = f'/garden/plot/{plot.id}/delete'
     response = client.delete(url)
 
     # Проверяем результат
@@ -194,7 +194,7 @@ def test_update_bed():
     client = APIClient()
 
     # Получаем JWT-токен
-    login_url = '/auth_api/login/'
+    login_url = '/users/login/'
     login_data = {'username': 'testuser', 'password': 'testpass'}
     login_response = client.post(login_url, login_data, format='json')
     assert login_response.status_code == 200
@@ -204,7 +204,7 @@ def test_update_bed():
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
     # Выполняем PUT-запрос для обновления грядки
-    url = f'/garden_api/bed/{bed.id}/update'
+    url = f'/garden/bed/{bed.id}/update'
     data = {'group': 2, 'wet': 75, 'info': 'Updated Info'}
     response = client.put(url, data, format='json')
 
@@ -230,7 +230,7 @@ def test_delete_bed():
     client = APIClient()
 
     # Получаем JWT-токен
-    login_url = '/auth_api/login/'
+    login_url = '/users/login/'
     login_data = {'username': 'testuser', 'password': 'testpass'}
     login_response = client.post(login_url, login_data, format='json')
     assert login_response.status_code == 200
@@ -240,7 +240,7 @@ def test_delete_bed():
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
     # Выполняем DELETE-запрос для удаления грядки
-    url = f'/garden_api/bed/{bed.id}/delete'
+    url = f'/garden/bed/{bed.id}/delete'
     response = client.delete(url)
 
     # Проверяем результат
@@ -257,7 +257,7 @@ def test_add_plant_to_bed():
     client = APIClient()
 
     # Получаем JWT-токен
-    login_url = '/auth_api/login/'
+    login_url = '/users/login/'
     login_data = {'username': 'testuser', 'password': 'testpass'}
     login_response = client.post(login_url, login_data, format='json')
     assert login_response.status_code == 200
@@ -267,7 +267,7 @@ def test_add_plant_to_bed():
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
     # Выполняем POST-запрос для добавления растения в грядку
-    url = f'/garden_api/bed/{bed.id}/add_plant'
+    url = f'/garden/bed/{bed.id}/add_plant'
     data = {'plant': 'Tomato'}
     response = client.post(url, data, format='json')
 
@@ -292,7 +292,7 @@ def test_get_bed_plant():
     client = APIClient()
 
     # Получаем JWT-токен
-    login_url = '/auth_api/login/'
+    login_url = '/users/login/'
     login_data = {'username': 'testuser', 'password': 'testpass'}
     login_response = client.post(login_url, login_data, format='json')
     assert login_response.status_code == 200
@@ -302,7 +302,7 @@ def test_get_bed_plant():
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
     # Выполняем GET-запрос для получения информации о растении
-    url = f'/garden_api/bed/{bed.id}/plant'
+    url = f'/garden/bed/{bed.id}/plant'
     response = client.get(url)
 
     # Проверяем результат
@@ -324,14 +324,14 @@ def test_add_plant_to_bed_with_existing_plant():
     client = APIClient()
 
     # Авторизация
-    login_url = '/auth_api/login/'
+    login_url = '/users/login/'
     login_data = {'username': 'testuser', 'password': 'testpass'}
     login_response = client.post(login_url, login_data, format='json')
     token = login_response.data['access']
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
     # Пытаемся добавить второе растение в грядку
-    url = f'/garden_api/bed/{bed.id}/add_plant'
+    url = f'/garden/bed/{bed.id}/add_plant'
     data = {'plant': 'Cucumber'}
     response = client.post(url, data, format='json')
 
@@ -352,7 +352,7 @@ def test_get_plant_catalog():
     client = APIClient()
 
     # Получаем JWT-токен
-    login_url = '/auth_api/login/'
+    login_url = '/users/login/'
     login_data = {'username': 'testuser', 'password': 'testpass'}
     login_response = client.post(login_url, login_data, format='json')
     assert login_response.status_code == 200
@@ -362,7 +362,7 @@ def test_get_plant_catalog():
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
     # GET-запрос к эндпоинту для получения каталога
-    url = "/garden_api/plants/"
+    url = "/garden/plants/"
     response = client.get(url)
     
     # Проверка результата
@@ -385,14 +385,14 @@ def test_water_bed():
     client = APIClient()
 
     # Авторизация
-    login_url = '/auth_api/login/'
+    login_url = '/users/login/'
     login_data = {'username': 'testuser', 'password': 'testpass'}
     login_response = client.post(login_url, login_data, format='json')
     token = login_response.data['access']
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
     # POST-запрос на полив грядки
-    url = f'/garden_api/bed/{bed.id}/water/'
+    url = f'/garden/bed/{bed.id}/water/'
     response = client.post(url)
 
     # Проверки
@@ -404,7 +404,7 @@ def test_water_bed():
 
 @pytest.mark.django_db
 def test_bed_status():
-    from garden_api.models import Plant
+    from garden.models import Plant
 
     # Создаём пользователя, растение, участок и увядшую грядку
     user = User.objects.create_user(username="testuser", email="test@example.com", password="testpass")
@@ -415,14 +415,14 @@ def test_bed_status():
     client = APIClient()
 
     # Авторизация
-    login_url = '/auth_api/login/'
+    login_url = '/users/login/'
     login_data = {'username': 'testuser', 'password': 'testpass'}
     login_response = client.post(login_url, login_data, format='json')
     token = login_response.data['access']
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
     # GET-запрос для статуса грядки
-    url = f'/garden_api/bed/{bed.id}/status/'
+    url = f'/garden/bed/{bed.id}/status/'
     response = client.get(url)
 
     # Проверки
@@ -432,7 +432,7 @@ def test_bed_status():
 
 @pytest.mark.django_db
 def test_remove_plant_from_bed():
-    from garden_api.models import Plant
+    from garden.models import Plant
 
     # Создаём пользователя, растение, участок и грядку с растением
     user = User.objects.create_user(username="testuser", email="testuser@example.com", password="testpass")
@@ -443,14 +443,14 @@ def test_remove_plant_from_bed():
     client = APIClient()
 
     # Авторизация
-    login_url = '/auth_api/login/'
+    login_url = '/users/login/'
     login_data = {'username': 'testuser', 'password': 'testpass'}
     login_response = client.post(login_url, login_data, format='json')
     token = login_response.data['access']
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
     # DELETE-запрос на удаление растения из грядки
-    url = f'/garden_api/bed/{bed.id}/remove_plant/'
+    url = f'/garden/bed/{bed.id}/remove_plant/'
     response = client.delete(url)
 
     # Проверки
@@ -461,7 +461,7 @@ def test_remove_plant_from_bed():
 
 @pytest.mark.django_db
 def test_get_beds_in_group():
-    from garden_api.models import Plant
+    from garden.models import Plant
 
     # Создаём пользователя, участок и грядки с разными группами
     user = User.objects.create_user(username="testuser", email="testuser@example.com", password="testpass")
@@ -475,14 +475,14 @@ def test_get_beds_in_group():
     client = APIClient()
 
     # Авторизация
-    login_url = '/auth_api/login/'
+    login_url = '/users/login/'
     login_data = {'username': 'testuser', 'password': 'testpass'}
     login_response = client.post(login_url, login_data, format='json')
     token = login_response.data['access']
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
     # GET-запрос для получения списка грядок в группе 1
-    url = '/garden_api/beds/group/1/'
+    url = '/garden/beds/group/1/'
     response = client.get(url)
 
     # Проверки
@@ -501,14 +501,14 @@ def test_change_bed_group():
     client = APIClient()
 
     # Авторизация
-    login_url = '/auth_api/login/'
+    login_url = '/users/login/'
     login_data = {'username': 'testuser', 'password': 'testpass'}
     login_response = client.post(login_url, login_data, format='json')
     token = login_response.data['access']
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
     # PATCH-запрос на изменение группы грядки
-    url = f'/garden_api/bed/{bed.id}/change_group/'
+    url = f'/garden/bed/{bed.id}/change_group/'
     data = {'group': 2}
     response = client.patch(url, data, format='json')
 
@@ -520,7 +520,7 @@ def test_change_bed_group():
 
 @pytest.mark.django_db
 def test_mass_water_beds_in_group():
-    from garden_api.models import Plant
+    from garden.models import Plant
 
     # Создаём пользователя, участок и несколько грядок
     user = User.objects.create_user(username="testuser", email="test@example.com", password="testpass")
@@ -534,14 +534,14 @@ def test_mass_water_beds_in_group():
     client = APIClient()
 
     # Авторизация
-    login_url = '/auth_api/login/'
+    login_url = '/users/login/'
     login_data = {'username': 'testuser', 'password': 'testpass'}
     login_response = client.post(login_url, login_data, format='json')
     token = login_response.data['access']
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
     # POST-запрос для полива группы 1
-    url = '/garden_api/beds/group/1/water/'
+    url = '/garden/beds/group/1/water/'
     response = client.post(url)
 
     # Проверки
@@ -556,7 +556,7 @@ def test_mass_water_beds_in_group():
 
 @pytest.mark.django_db
 def test_reset_group_for_beds():
-    from garden_api.models import Plant
+    from garden.models import Plant
 
     # Создаём пользователя, участок и несколько грядок в одной группе
     user = User.objects.create_user(username="testuser", email="test@example.com", password="testpass")
@@ -570,14 +570,14 @@ def test_reset_group_for_beds():
     client = APIClient()
 
     # Авторизация
-    login_url = '/auth_api/login/'
+    login_url = '/users/login/'
     login_data = {'username': 'testuser', 'password': 'testpass'}
     login_response = client.post(login_url, login_data, format='json')
     token = login_response.data['access']
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
     # DELETE-запрос для сброса группы 1
-    url = '/garden_api/beds/group/1/reset/'
+    url = '/garden/beds/group/1/reset/'
     response = client.delete(url)
 
     # Проверки
@@ -593,9 +593,9 @@ def test_plant_list_caching():
     client = APIClient()
 
     # Первый запрос – без кэша
-    response = client.get('/garden_api/plants/')
+    response = client.get('/garden/plants/')
     assert response.status_code == 200
 
     # Второй запрос – должен вернуться из кэша
-    response_cached = client.get('/garden_api/plants/')
+    response_cached = client.get('/garden/plants/')
     assert response_cached.status_code == 200

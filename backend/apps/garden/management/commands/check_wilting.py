@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from garden_api.models import Bed
+from garden.models import Bed
 from django.utils.timezone import now, timedelta
 
 class Command(BaseCommand):

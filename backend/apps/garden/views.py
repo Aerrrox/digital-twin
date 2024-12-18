@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 
-from auth_api.models import User
+from apps.users.models import User
 from .models import Plant, Plot, Bed
 from .serializer import (
     PlotGetSerializer, PlotPostSerializer, BedListSerializer, NewBedSerializer,

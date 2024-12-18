@@ -2,12 +2,12 @@ import pytest
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from garden_api.models import User
+from garden.models import User
 
 @pytest.mark.django_db
 def test_register_user():
     client = APIClient()
-    url = '/auth_api/register/'
+    url = '/users/register/'
     data = {"username": "testuser", "password": "testpass", "email": "test@example.com"}
 
     # POST-запрос на регистрацию
@@ -26,7 +26,7 @@ def test_register_user():
 def test_register_existing_user():
     User.objects.create_user(username="testuser", password="testpass", email="test@example.com")
     client = APIClient()
-    url = '/auth_api/register/'
+    url = '/users/register/'
     data = {"username": "testuser", "password": "testpass", "email": "test@example.com"}
 
     # Повторная регистрация
@@ -40,7 +40,7 @@ def test_register_existing_user():
 def test_login_user():
     User.objects.create_user(username="testuser", password="testpass", email="test@example.com")
     client = APIClient()
-    url = '/auth_api/login/'
+    url = '/users/login/'
     data = {"username": "testuser", "password": "testpass"}
 
     # POST-запрос на логин
@@ -55,7 +55,7 @@ def test_login_user():
 def test_login_user_invalid_credentials():
     User.objects.create_user(username="testuser", password="testpass", email="test@example.com")
     client = APIClient()
-    url = '/auth_api/login/'
+    url = '/users/login/'
     data = {"username": "testuser", "password": "wrongpass"}
 
     # Логин с неверным паролем
@@ -67,7 +67,7 @@ def test_login_user_invalid_credentials():
 
 @pytest.mark.django_db
 def test_logout_user():
-    from garden_api.models import User
+    from garden.models import User
 
     # Создаём пользователя
     user = User.objects.create_user(username="testuser", password="testpass", email="test@example.com")
@@ -75,7 +75,7 @@ def test_logout_user():
     client = APIClient()
 
     # Логинимся и получаем токены
-    login_url = '/auth_api/login/'
+    login_url = '/users/login/'
     login_data = {"username": "testuser", "password": "testpass", "email": "test@example.com"}
     login_response = client.post(login_url, login_data, format='json')
 
@@ -87,7 +87,7 @@ def test_logout_user():
     client.credentials(HTTP_AUTHORIZATION=f"Bearer {access_token}")
 
     # Отправляем refresh-токен для логаута
-    logout_url = '/auth_api/logout/'
+    logout_url = '/users/logout/'
     logout_data = {"refresh": refresh_token}
     response = client.post(logout_url, logout_data, format='json')
 
@@ -100,12 +100,12 @@ def test_home_view():
     client = APIClient()
 
     # Получаем токен для пользователя
-    login_response = client.post('/auth_api/login/', {"username": "testuser", "password": "testpass"}, format='json')
+    login_response = client.post('/users/login/', {"username": "testuser", "password": "testpass"}, format='json')
     token = login_response.data['access']
 
     # Запрос к HomeView с токеном
     client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
-    url = '/auth_api/home/'
+    url = '/users/home/'
 
     response = client.get(url)
 
@@ -117,7 +117,7 @@ def test_home_view():
 @pytest.mark.django_db
 def test_home_view_unauthorized():
     client = APIClient()
-    url = '/auth_api/home/'
+    url = '/users/home/'
 
     # Запрос без токена
     response = client.get(url)
