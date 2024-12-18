@@ -2,7 +2,9 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+import locale
 
+locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
 def main():
     """Run administrative tasks."""

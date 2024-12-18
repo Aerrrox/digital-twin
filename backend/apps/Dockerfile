@@ -11,7 +11,7 @@ ENV LANG=ru_RU.UTF-8 \
     LC_ALL=ru_RU.UTF-8
 
 # Рабочая директория
-WORKDIR /app
+WORKDIR /.
 
 # Копируем requirements и устанавливаем зависимости
 COPY ./requirements.txt .
@@ -27,9 +27,9 @@ RUN python manage.py collectstatic --noinput
 ENV CELERY_BROKER_URL=redis://redis:6379/1
 ENV CELERY_RESULT_BACKEND=redis://redis:6379/2
 ENV POSTGRES_HOST=postgres
-ENV POSTGRES_DB=your_db_name
-ENV POSTGRES_USER=your_user
-ENV POSTGRES_PASSWORD=your_password
+ENV POSTGRES_DB=digitaltwin
+ENV POSTGRES_USER=dguser
+ENV POSTGRES_PASSWORD=dgpassword
 
 # Запуск сервера
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

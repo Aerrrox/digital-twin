@@ -1,10 +1,10 @@
 openapi: 3.0.0
 info:
-  title: My API
+  title: Super API for our GARDEN!!!
   description: API documentation for my service
   version: 1.0.0
 servers:
-  - url: http://localhost:8000 # Указываем адрес вашего API
+  - url: http://backend:8000 # Указываем адрес вашего API
 paths:
   /users:
     get:

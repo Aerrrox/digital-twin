@@ -1,6 +1,6 @@
 from django.db import models
 
-from apps.users.models import User
+from users.models import User
 
 class Plant(models.Model):
     title = models.CharField('plantname', max_length=128, unique=True)
