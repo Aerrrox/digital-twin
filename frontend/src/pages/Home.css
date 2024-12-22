@@ -1,0 +1,150 @@
+.header {
+  background-color: #4CAF50;
+}
+
+.profile-btn {
+  border-color: #4CAF50;
+}
+
+.profile-btn:hover, .profile-btn:focus {
+  border-color: #4CAF50;
+}
+
+.header-nav-btn {
+  background-color: white;
+  border: 1px solid white;
+  color: rgba(var(--bs-dark-rgb),var(--bs-text-opacity));
+}
+
+.header-nav-btn:focus {
+  color: rgba(var(--bs-dark-rgb),var(--bs-text-opacity));
+}
+
+.header-nav-btn img {
+  transition: filter .15s ease-in-out, transform .2s ease-in-out;
+  transform: scale(1);
+  filter: invert(1);
+}
+
+.header-nav-btn:hover {
+  background-color: transparent;
+  color: white;
+}
+
+.header-nav-btn:hover img {
+  filter: invert(0);
+  transform: scale(1.2);
+}
+
+.bottom-navbar {
+  background-color: #4CAF50;
+}
+
+.bottom-navbar-nav .current {
+  color: rgba(var(--bs-dark-rgb),var(--bs-text-opacity));
+  background-color: white;
+}
+
+.add-plot-btn {
+  background-color: white;
+  color: rgba(var(--bs-dark-rgb),var(--bs-text-opacity));
+  border: 1px solid white;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-plot-btn:hover, .add-plot-btn:focus, .add-plot-btn:active {
+  background-color: white !important;
+  border-color: white !important;
+}
+
+.plot {
+  height: calc(100vh - 90px - 50px);
+  width: 100vw;
+  display: block;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.garden-bed {
+  min-width: 160px;
+  min-height: 160px;
+  height: 160px;
+  width: 160px;
+  padding: 3px 7px;
+  border-radius: 10%;
+  aspect-ratio: 1/1;
+  background-image: url("../images/bed.svg");
+  background-size: cover;
+  resize: both;
+  overflow: auto;
+}
+
+.dropdown-plants {
+  width: 300px;
+}
+
+.btn-add {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.btn-add:hover, .btn-add:focus, .btn-add:active {
+  color: white !important;
+  background-color: #318a34 !important;
+}
+
+.beds-spinner { 
+  animation: spinning 1.2s linear infinite;
+}
+
+@keyframes spinning {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.select-plant-btn {
+  border-radius: 3px;
+}
+
+.select-plant-btn:focus, .select-plant-btn:active {
+  background-color: #4CAF50;
+}
+
+.carrot-cursor {
+  cursor: url("../images/mini-carrots.png"), auto;
+}
+
+.tomato-cursor {
+  cursor: url("../images/mini-tomato.png"), auto;
+}
+
+.potato-cursor {
+  cursor: url("../images/mini-potato.png"), auto;
+}
+
+.cabbage-cursor {
+  cursor: url("../images/mini-cabbage.png"), auto;
+}
+
+.eggplant-cursor {
+  cursor: url("../images/mini-eggplant.png"), auto;
+}
+
+.beet-cursor {
+  cursor: url("../images/mini-beet.png"), auto;
+}
+
+.peas-cursor {
+  cursor: url("../images/mini-green-peas.png"), auto;
+}
+
+.pepper-cursor {
+  cursor: url("../images/mini-chili.png"), auto;
+}
