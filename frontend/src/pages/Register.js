@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import bgImg from "../images/bg.jpg";
 
 function Register() {
     const [username, setUsername] = useState('');
@@ -86,7 +87,7 @@ function Register() {
           justifyContent: 'center',
           alignItems: 'center',
           height: '100vh',
-          backgroundImage: 'url("./agr.jpg")',
+          backgroundImage: `url(${bgImg})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         },
