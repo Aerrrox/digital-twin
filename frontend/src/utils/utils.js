@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom'
+
 export function checkAuthStatus() {
     return !!localStorage.getItem('accessToken')
 }
@@ -70,11 +72,8 @@ export async function fetchUserProfile() {
         })  
         const data = await response.json()
 
-        if (response.ok) {
-            return data
-        } else {
-            return null
-        }
+        if (response.ok) return data
+        else return null
     } catch(error) {
         console.error('Ошибка запроса', error)
         return null
@@ -106,6 +105,4 @@ export async function handleLogout() {
 
     localStorage.removeItem('accessToken')
     localStorage.removeItem('refreshToken')
-
-    alert('Вы успешно вышли из системы')
 }

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import bgImg from "../images/bg.jpg";
 
 function Login() {
     const [username, setUsername] = useState('');
@@ -29,7 +30,6 @@ function Login() {
             });
             localStorage.setItem('accessToken', data.access);
             localStorage.setItem('refreshToken', data.refresh);
-            alert(data.message);
             navigate('/'); // Перенаправляем на главную
         } catch (error) {
             alert(error.message);
@@ -74,7 +74,7 @@ function Login() {
           justifyContent: 'center',
           alignItems: 'center',
           height: '100vh',
-          backgroundImage: 'url("./agr.jpg")',
+          backgroundImage: `url(${bgImg})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         },
