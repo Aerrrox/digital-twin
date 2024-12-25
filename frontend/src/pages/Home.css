@@ -45,21 +45,6 @@
   background-color: white;
 }
 
-.add-plot-btn {
-  background-color: white;
-  color: rgba(var(--bs-dark-rgb),var(--bs-text-opacity));
-  border: 1px solid white;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.add-plot-btn:hover, .add-plot-btn:focus, .add-plot-btn:active {
-  background-color: white !important;
-  border-color: white !important;
-}
-
 .plot {
   height: calc(100vh - 90px - 50px);
   width: 100vw;
@@ -69,29 +54,36 @@
 }
 
 .garden-bed {
-  min-width: 160px;
-  min-height: 160px;
-  height: 160px;
-  width: 160px;
-  padding: 3px 7px;
-  border-radius: 10%;
+  position: absolute;
+  min-width: 175px;
+  min-height: 175px;
+  padding: 5px;
+  border-radius: 14px;
   aspect-ratio: 1/1;
   background-image: url("../images/bed.svg");
   background-size: cover;
   resize: both;
   overflow: auto;
+  font-family: "Nunito Sans", serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-weight: 400;
 }
 
 .dropdown-plants {
   width: 300px;
 }
 
-.btn-add {
+.dropdown-profile {
+  width: 260px;
+}
+
+.btn-green {
   background-color: #4CAF50;
   color: white;
 }
 
-.btn-add:hover, .btn-add:focus, .btn-add:active {
+.btn-green:hover, .btn-green:focus, .btn-green:active {
   color: white !important;
   background-color: #318a34 !important;
 }
@@ -109,11 +101,11 @@
   }
 }
 
-.select-plant-btn {
+.dropdown-btn {
   border-radius: 3px;
 }
 
-.select-plant-btn:focus, .select-plant-btn:active {
+.dropdown-btn:focus, .dropdown-btn:active {
   background-color: #4CAF50;
 }
 
@@ -147,4 +139,22 @@
 
 .pepper-cursor {
   cursor: url("../images/mini-chili.png"), auto;
+}
+
+.watering-can-cursor {
+  cursor: url("../images/mini-watering-can-color.png"), auto;
+}
+
+
+.avatar-btn {
+  border-radius: 5px;
+}
+
+.avatar-btn.active, .avatar-btn:focus, .avatar-btn:active {
+  background-color: #4CAF50;
+}
+
+.bed-info-btn {
+  background: transparent;
+  border: none;
 }
